@@ -2,6 +2,7 @@ from koko.lib.shapes import *
 import math
 import copy
 from math import log, ceil
+import string
 
 class DashboardGlobals:
       square_size = 3
@@ -121,7 +122,7 @@ class DashboardWidget(DashboardMatrix):
           else:
               text_y = text_height/2.0 + DashboardGlobals.slot_height*1.1
               
-          ts = text(self.label, text_x, text_y, text_height)
+          ts = text(self.label.upper(), text_x, text_y, text_height)
           return move(ts,self.x,self.y)
 
       def render(self):
@@ -358,16 +359,22 @@ class DashboardButtonMatrix(DashboardMatrix):
     def __init__(self,x,y,rows,cols):
         DashboardMatrix.__init__(self,x,y,rows,cols)
         self.buttons = []
+        self.hide_joints = False
+        self.label = ''
         for col in range(0,self.cols):
             for row in range(0,self.rows):
                 pos_x = self.x + self.square_size*col
                 pos_y = self.y + self.square_size*row
                 self.buttons.append(DashboardButton(pos_x,pos_y))
 
+    def accessories(self):
+        return None
 
     def render(self):
         res = rectangle(0,0,0,0)
         for b in self.buttons:
+            b.hide_joints = self.hide_joints
+            b.label = self.label
             res+=b.render()
         return res
 
@@ -382,7 +389,7 @@ class DashboardRender:
         self.class_mapping = {
             'button'  : DashboardButton,
             'display' : DashboardDisplay,
-            'button_matrix' : DashboardButtonMatrix,
+            #'button_matrix' : DashboardButtonMatrix,
             'widget' : DashboardWidget,
             'speaker' : DashboardSpeaker,
             'knob' : DashboardKnob,
@@ -593,19 +600,23 @@ class DashboardCuttingRender(DashboardRender):
 
 
 shape_list = [
-    {'type' : 'button', 'pos_x' : 0, 'pos_y' : 0, 'rows':2, 'cols':2, 'label': 'TEST-IGNITION','label_pos':'bottom'},
-    {'type' : 'dial', 'pos_x' : 2, 'pos_y' : 0, 'label': 'test_me','label_pos':'bottom' },
-    {'type' : 'slider', 'pos_x' : 2, 'pos_y' : 0, 'label': 'test_me','label_pos':'bottom' },
-    {'type' : 'slider', 'pos_x' : 2, 'pos_y' : 0, 'label': 'test_me','label_pos':'bottom' },
-    {'type' : 'button', 'pos_x' : 2, 'pos_y' : 0, 'label': 'test_me','label_pos':'bottom' },
-    {'type' : 'button', 'pos_x' : 2, 'pos_y' : 0, 'label': 'test_me','label_pos':'bottom' },
-    {'type' : 'button', 'pos_x' : 2, 'pos_y' : 0, 'label': 'test_me','label_pos':'bottom' },
-    {'type' : 'display', 'pos_x' : 2, 'pos_y' : 0, 'label': 'test_me','label_pos':'bottom' },
-    {'type' : 'knob', 'pos_x' : 2, 'pos_y' : 0, 'label': 'test_me','label_pos':'bottom' },
-    {'type' : 'speaker', 'pos_x' : 2, 'pos_y' : 0, 'label': 'test_me','label_pos':'bottom' },
+    {'type' : 'button', 'pos_x' : 0, 'pos_y' : 0, 'rows':2, 'cols':2, 'label': 'LargeButton','label_pos':'bottom'},
+    {'type' : 'dial', 'pos_x' : 2, 'pos_y' : 0, 'label': 'Selector','label_pos':'top' },
+    {'type' : 'slider', 'pos_x' : 0, 'pos_y' : 2, 'label': 'Slider','label_pos':'bottom' },
+    {'type' : 'button', 'pos_x' : 3, 'pos_y' : 2, 'label': 'Button','label_pos':'bottom' },
+    {'type' : 'display', 'pos_x' : 0, 'pos_y' : 4, 'label': 'Display','label_pos':'bottom' },
+    {'type' : 'knob', 'pos_x' : 3, 'pos_y' : 4, 'label': 'Knob','label_pos':'bottom' },
+    {'type' : 'knob', 'pos_x' : 3, 'pos_y' : 5, 'label': 'Knob','label_pos':'bottom' },
+    {'type' : 'speaker', 'pos_x' : 0, 'pos_y' : 6, 'label': 'Speaker','label_pos':'bottom' },
+    {'type' : 'speaker', 'pos_x' : 2, 'pos_y' : 6, 'label': 'Speaker','label_pos':'bottom' },
+    {'type' : 'button', 'pos_x' : 0, 'pos_y': 3, 'label' : 'Button', 'label_post': 'top'},
+    {'type' : 'button', 'pos_x' : 1, 'pos_y': 3, 'label' : 'Button', 'label_post': 'top'},
+    {'type' : 'button', 'pos_x' : 2, 'pos_y': 3, 'label' : 'Button', 'label_post': 'top'},
+    {'type' : 'button', 'pos_x' : 3, 'pos_y': 3, 'label' : 'Button', 'label_post': 'top'},
+
 ]
 
 cad.mm_per_unit=10
-
-d = DashboardCuttingRender(shape_list,10*DashboardGlobals.square_size,10*DashboardGlobals.square_size)
+d = DashboardCuttingRender(shape_list,12*DashboardGlobals.square_size,12*DashboardGlobals.square_size)
+#d=DashboardPreviewRender(shape_list)
 cad.shapes = d.render()
