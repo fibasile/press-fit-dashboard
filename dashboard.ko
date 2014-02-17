@@ -6,15 +6,15 @@ import string
 
 class DashboardGlobals:
       square_size = 3
-      slot_width = .3
-      peg_width = .32
+      slot_width = .4
+      peg_width = .55
       slot_height = .4
       champher = .2
-      pole_width = .4
+      pole_width = .6
       pole_height = pole_width*2.5
-      material_height = slot_width
+      material_height = .22
       text_height = slot_height*0.65
-      padding = .5
+      padding = .8
 
 
 class DashboardShape:
@@ -142,7 +142,7 @@ class DashboardWidget(DashboardMatrix):
                     is_slot = self.top_slot(i)
 
                     slot = DashboardJoint(self.x,self.y , is_slot )
-                    piece = move(slot.render(), self.square_size/2.0 + (i)*self.square_size, (self.rows)*self.square_size)
+                    piece = move(slot.render(), self.square_size/2.0 + (i)*self.square_size, (self.rows)*self.square_size*0.9999)
                     if is_slot: sh-=piece
                     else: sh+=piece
                 if self.bottom_slot(i) or self.bottom_peg(i):
@@ -188,10 +188,10 @@ class DashboardKnob(DashboardWidget):
         c = circle(center, center, radius)
         ic = circle(center,center,inner_radius)
         pole = rectangle(center-pw,center+pw,center-ph, center+ph)
-        hole = rectangle(center-pw,center+pw, center-mh,center+mh)
+        hole = rectangle(center-pw*.95,center+pw*.95, center-mh,center+mh)
         c-=hole
         ic-=hole
-        return move(ic,self.x+self.width()*0.85,self.y) + move(c,self.x+self.width()*1.5,self.y) + move(pole,self.x+self.width()*2, self.y)
+        return move(ic,self.x+self.width()*0.85,self.y) + move(c,self.x+self.width()*1.5,self.y) + move(pole,self.x+self.width()*1.95, self.y)
 
     def accessories_width(self):
         return self.width()*1.6
@@ -217,7 +217,8 @@ class DashboardSpeaker(DashboardWidget):
         radius = (bw*0.80)/20
         for i in range(1,10):
             for j in range(1,10):
-                res-=move(circle(0, 0 ,radius*0.9),self.x+dw+i*2*radius,self.y+dh+j*2*radius)
+                if (i%2==0 and j%2==1) or (i%2==1 and j%2==0):
+                    res-=move(circle(0, 0 ,radius*0.9),self.x+dw+i*2*radius,self.y+dh+j*2*radius)
 
         return res
 
@@ -253,22 +254,22 @@ class DashboardSlider(DashboardWidget):
     def accessories(self):
         pw = DashboardGlobals.pole_width/2.0
         ph = DashboardGlobals.pole_height/2.0
-        mh = DashboardGlobals.material_height/2.0
+        mh = DashboardGlobals.material_height /2.0
         pole = rectangle(0,pw*2, 0, ph*2)
-        margin = DashboardGlobals.square_size * 0.5
+        margin = DashboardGlobals.square_size * 0.1
         knob_width = self.slider_width/4
         knob_bottom_height = self.slider_height
         knob_top_height = self.slider_height*1.2
 
         knob_bottom = rectangle(-knob_width/2.0, knob_width/2.0, -knob_bottom_height/2.0,knob_bottom_height/2.0 )
-        pole_hole = rectangle(-pw, pw, -mh,mh)
+        pole_hole = rectangle(-pw*0.95, pw*0.95, -mh,mh)
         knob_bottom -= pole_hole
         knob_top = rectangle(-knob_width/2.0, knob_width/2.0, -knob_top_height/2.0,knob_top_height/2.0 )
         knob_top -= pole_hole
 
-        res = move(knob_bottom,self.x+self.width()+knob_width,self.y+knob_bottom_height)
-        res += move(pole,self.x+self.width()+pw,self.y+ph) 
-        res += move(knob_top, self.x+self.width()+knob_width,self.y+2*knob_top_height)
+        res = move(knob_bottom,self.x+self.width()+knob_width+2*margin,self.y+knob_bottom_height)
+        res += move(pole,self.x+self.width()+pw+margin,self.y+ph) 
+        res += move(knob_top, self.x+self.width()+knob_width+2*margin,self.y+2*knob_top_height)
         return res
 
     def accessories_width(self):
@@ -300,7 +301,7 @@ class DashboardButton(DashboardWidget):
         mh = DashboardGlobals.material_height/2.0
  
         pole = rectangle(0,pw*2, 0, ph*2)
-        margin = DashboardGlobals.square_size * 0.1
+        margin = DashboardGlobals.square_size * 0.05
 
         knob_bottom_width = self.content_width
         knob_bottom_height = self.content_height
@@ -309,7 +310,7 @@ class DashboardButton(DashboardWidget):
         knob_top_height = self.content_height*1.2
 
         knob_bottom = rectangle(-knob_bottom_width/2.0, knob_bottom_width/2.0, -knob_bottom_height/2.0,knob_bottom_height/2.0 )
-        pole_hole = rectangle(-pw, pw, -mh,mh)
+        pole_hole = rectangle(-pw*0.95, pw*0.95, -mh,mh)
         knob_bottom -= pole_hole
         knob_top = rectangle(-knob_top_width/2.0, knob_top_width/2.0, -knob_top_height/2.0,knob_top_height/2.0 )
         knob_top -= pole_hole
@@ -319,7 +320,7 @@ class DashboardButton(DashboardWidget):
         #knob-=hole
 
         res = move(knob_bottom,self.x+self.width()+margin+knob_bottom_width,self.y+self.height()/2.0)
-        res += move(pole,self.x+self.width()+pw+margin,self.y+self.height()/2.0-ph) 
+        res += move(pole,self.x+self.width()+margin,self.y+self.height()/2.0-ph) 
         res += move(knob_top, self.x+self.width()+margin+knob_bottom_width+knob_top_width,self.y+self.height()/2.0)
         return res
         
@@ -443,6 +444,81 @@ class DashboardPreviewRender(DashboardRender):
     def __init__(self,shape_list):
         DashboardRender.__init__(self,shape_list)
         self.preview = True
+
+
+class DashboardBoxBorderLeft(DashboardWidget):
+
+      def top_peg(self,col):
+            return False
+
+      def render(self):
+          s = DashboardWidget.render(self)
+          return rotate(s,90)
+
+class DashboardBoxBorderRight(DashboardWidget):
+
+      def top_slot(self,col):
+            return False
+
+      def top_peg(self,col):
+            return False
+
+
+      def bottom_peg(self,col):
+            return True
+
+      def bottom_slot(self,col):
+            return False
+
+      def render(self):
+          s = DashboardWidget.render(self)
+          return rotate(reflect_x(s),-90)
+
+
+class DashboardBoxBorderTop(DashboardWidget):
+
+      def top_slot(self,col):
+            return False
+
+      def top_peg(self,col):
+            return False
+
+      def left_peg(self,row):
+            return False
+
+      def right_slot(self,row):
+            return False
+
+
+
+class DashboardBoxRender(DashboardRender):
+
+    def __init__(self,shape_list,box_height=1,border_width=1):
+        DashboardRender.__init__(self,shape_list)
+        self.max_x = 0 #box inner width
+        self.max_y = 0 #box inner height
+        self.box_height = box_height
+        self.border_width = border_width
+
+    def render(self):
+        self.compute_layout()
+        for shape in self._shapes:
+            if shape.xmax - shape.xmin > self.max_x:
+                self.max_x = shape.xmax
+            if shape.ymax > self.max_y:
+                self.max_y = shape.ymax
+        
+        border_cols = int(ceil(self.max_x / self.sqs)) 
+        border_rows = int(ceil(self.max_y / self.sqs)) 
+
+        print 'border %d x %d' % (border_rows,border_cols)
+        top = DashboardBoxBorderTop(-self.border_width*self.sqs, border_rows*self.sqs, self.border_width, border_cols )
+        left = DashboardBoxBorderLeft(0, 0, self.border_width,border_rows )
+        right = DashboardBoxBorderRight(0, self.max_x, self.border_width,border_rows)
+        return [top.render(), left.render(),right.render()]
+
+
+
 
 
 class PackingNode:
@@ -600,23 +676,33 @@ class DashboardCuttingRender(DashboardRender):
 
 
 shape_list = [
-    {'type' : 'button', 'pos_x' : 0, 'pos_y' : 0, 'rows':2, 'cols':2, 'label': 'LargeButton','label_pos':'bottom'},
-    {'type' : 'dial', 'pos_x' : 2, 'pos_y' : 0, 'label': 'Selector','label_pos':'top' },
-    {'type' : 'slider', 'pos_x' : 0, 'pos_y' : 2, 'label': 'Slider','label_pos':'bottom' },
-    {'type' : 'button', 'pos_x' : 3, 'pos_y' : 2, 'label': 'Button','label_pos':'bottom' },
-    {'type' : 'display', 'pos_x' : 0, 'pos_y' : 4, 'label': 'Display','label_pos':'bottom' },
-    {'type' : 'knob', 'pos_x' : 3, 'pos_y' : 4, 'label': 'Knob','label_pos':'bottom' },
-    {'type' : 'knob', 'pos_x' : 3, 'pos_y' : 5, 'label': 'Knob','label_pos':'bottom' },
-    {'type' : 'speaker', 'pos_x' : 0, 'pos_y' : 6, 'label': 'Speaker','label_pos':'bottom' },
-    {'type' : 'speaker', 'pos_x' : 2, 'pos_y' : 6, 'label': 'Speaker','label_pos':'bottom' },
-    {'type' : 'button', 'pos_x' : 0, 'pos_y': 3, 'label' : 'Button', 'label_post': 'top'},
-    {'type' : 'button', 'pos_x' : 1, 'pos_y': 3, 'label' : 'Button', 'label_post': 'top'},
-    {'type' : 'button', 'pos_x' : 2, 'pos_y': 3, 'label' : 'Button', 'label_post': 'top'},
-    {'type' : 'button', 'pos_x' : 3, 'pos_y': 3, 'label' : 'Button', 'label_post': 'top'},
-
+    {'type' : 'button', 'pos_x' : 0, 'pos_y' : 0, 'rows':2, 'cols':2, 'label': '','label_pos':'bottom'},
+    {'type' : 'dial', 'pos_x' : 2, 'pos_y' : 0, 'label': '','label_pos':'top' },
+    {'type' : 'slider', 'pos_x' : 0, 'pos_y' : 2, 'label': '','label_pos':'bottom' },
+    {'type' : 'button', 'pos_x' : 3, 'pos_y' : 2, 'label': '','label_pos':'bottom' },
+    {'type' : 'display', 'pos_x' : 0, 'pos_y' : 4, 'label': '','label_pos':'bottom' },
+    {'type' : 'knob', 'pos_x' : 3, 'pos_y' : 4, 'label': '','label_pos':'bottom' },
+    {'type' : 'knob', 'pos_x' : 3, 'pos_y' : 5, 'label': '','label_pos':'bottom' },
+    {'type' : 'speaker', 'pos_x' : 0, 'pos_y' : 6, 'label': '','label_pos':'bottom' },
+    {'type' : 'speaker', 'pos_x' : 2, 'pos_y' : 6, 'label': '','label_pos':'bottom' },
+    {'type' : 'button', 'pos_x' : 0, 'pos_y': 3, 'label' : '', 'label_post': 'top'},
+    {'type' : 'button', 'pos_x' : 1, 'pos_y': 3, 'label' : '', 'label_post': 'top'},
+    {'type' : 'button', 'pos_x' : 2, 'pos_y': 3, 'label' : '', 'label_post': 'top'},
+    {'type' : 'button', 'pos_x' : 3, 'pos_y': 3, 'label' : '', 'label_post': 'top'},
 ]
 
+mode = "cutting"
+
+
 cad.mm_per_unit=10
-d = DashboardCuttingRender(shape_list,12*DashboardGlobals.square_size,12*DashboardGlobals.square_size)
-#d=DashboardPreviewRender(shape_list)
+d=None
+
+
+if mode == "cutting":
+    d = DashboardCuttingRender(shape_list,12*DashboardGlobals.square_size,12*DashboardGlobals.square_size)
+elif mode == "preview":
+    d=DashboardPreviewRender(shape_list)
+elif mode == "box":
+    d=DashboardBoxRender(shape_list)
+
 cad.shapes = d.render()
